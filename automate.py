@@ -31,6 +31,38 @@ class Automate:
 
         return cls(alphabet, etats, etats_initiaux, etats_terminaux, transitions)
 
+        def afficher(self):
+        print(f"Alphabet : {self.alphabet}")
+        print(f"États : {self.etats}")
+        print(f"États initiaux : {self.etats_initiaux}")
+        print(f"États terminaux : {self.etats_terminaux}")
+        print("Table des transitions :")
+        for etat in self.etats:
+            print(f"{etat}: {self.transitions.get(etat, {})}")
+
+    def est_deterministe(self):
+        for etat, trans in self.transitions.items():
+            for symbole, etats_suivants in trans.items():
+                if len(etats_suivants) > 1:
+                    print(f"Non déterministe : l'état {etat} a plusieurs transitions ({symbole}) vers {etats_suivants}")
+                    return False
+        return True
+
+    def est_complet(self):
+        for etat in self.etats:
+            for symbole in self.alphabet:
+                if symbole not in self.transitions.get(etat, {}):
+                    print(f"Non complet : l'état {etat} n'a pas de transition pour le symbole {symbole}")
+                    return False
+        return True
+
+    def est_standard(self):
+        if len(self.etats_initiaux) > 1:
+            print("Non standard : plusieurs états initiaux trouvés.")
+            return False
+        return True
+
+    
     def afficher(self):
         print(f"Alphabet : {self.alphabet}")
         print(f"États : {self.etats}")
