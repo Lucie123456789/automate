@@ -62,6 +62,32 @@ class Automate:
             return False
         return True
 
+            def minimisation(self):
+            partitions = [set(self.etats_terminaux), set(self.etats) - set(self.etats_terminaux)]
+            stable = False
+            iteration = 1
+
+            while not stable:
+                print(f"Partition {iteration}: {partitions}")
+                stable = True
+                new_partitions = []
+                for group in partitions:
+                    split_groups = {}
+                    for state in group:
+                        key = tuple(sorted((symbole, next(iter(self.transitions[state][symbole]), None))
+                                           for symbole in self.alphabet if symbole in self.transitions[state]))
+                        if key not in split_groups:
+                            split_groups[key] = set()
+                        split_groups[key].add(state)
+                    new_partitions.extend(split_groups.values())
+
+                if new_partitions != partitions:
+                    stable = False
+                    partitions = new_partitions
+                iteration += 1
+
+            print(f"Automate minimisé: {partitions}")
+            return partitions
     
     def afficher(self):
         print(f"Alphabet : {self.alphabet}")
