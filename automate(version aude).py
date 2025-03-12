@@ -1,4 +1,5 @@
 import re
+import os
 
 class Automate:
     def __init__(self):
@@ -120,8 +121,16 @@ class Automate:
 
     def lire_depuis_fichier(self, chemin):
         """Charge un automate depuis un fichier texte."""
-        with open(chemin, 'r') as f:
-            lignes = [ligne.strip() for ligne in f if ligne.strip()]
+        try:
+            with open(chemin, 'r') as f:
+                lignes = [ligne.strip() for ligne in f if ligne.strip()]
+        except FileNotFoundError:
+            print(f"Erreur : Le fichier {chemin} n'a pas été trouvé dans {os.path.abspath(chemin)}.")
+            print("Assurez-vous que le fichier existe ou spécifiez le bon chemin.")
+            return False
+        except Exception as e:
+            print(f"Une erreur s'est produite lors de la lecture du fichier : {e}")
+            return False
 
         self.alphabet = set(re.split(r'\s+', lignes[0]))
         self.states = set(re.split(r'\s+', lignes[1]))
@@ -131,9 +140,9 @@ class Automate:
         for ligne in lignes[4:]:
             source, symbole, destination = re.split(r'\s+', ligne)
             self.transitions.setdefault((source, symbole), set()).add(destination)
-
-    def afficher(self):
-        """Affiche l'automate sous forme lisible."""
+        return True
+    
+    def afficher(self, automate_original=None):
         print('=== Automate ===')
         print('Alphabet :', ' '.join(sorted(self.alphabet)))
         print('États :', ' '.join(sorted(self.states)))
@@ -153,29 +162,102 @@ class Automate:
 
         print(f"\nDéterministe : {'Oui' if self.est_deterministe() else 'Non'}")
         print(f"Complet : {'Oui' if self.est_complet() else 'Non'}")
-        print(f"Standard : {'Oui' if self.est_standard() else 'Non'}")  # 🔹 Ajout de l'affichage de la standardisation
+        print(f"Standard : {'Oui' if self.est_standard() else 'Non'}")
+        print(f"Minimisé : {'Oui' if (automate_original and self.est_minimise(automate_original)) else 'Non'}")
+
+
+
+    def est_minimise(self, automate_original):
+        """Vérifie si l'automate a été minimisé."""
+        return len(self.states) == len(automate_original.states)
+
+    def minimisation(self):
+        automate_original = Automate()
+        automate_original.states = self.states.copy()
+        automate_original.transitions = self.transitions.copy()
+        automate_original.final_states = self.final_states.copy()
+        automate_original.initial_states = self.initial_states.copy()
+
+        # Initialisation de deux partitions
+        partition = [
+            set(self.final_states),
+            set(self.states) - set(self.final_states)
+        ]
+
+        changement = True
+        while changement:
+            changement = False
+            nouvelle_partition = []
+
+            for groupe in partition:
+                sous_partitions = {}
+
+                for état in groupe:
+                    signature = tuple(
+                        next((i for i, part in enumerate(partition) if self.transitions.get((état, sym)) in part), -1)
+                        for sym in self.alphabet
+                    )
+
+                    if signature not in sous_partitions:
+                        sous_partitions[signature] = set()
+                    sous_partitions[signature].add(état)
+
+                nouvelle_partition.extend(sous_partitions.values())
+                if len(sous_partitions) > 1:
+                    changement = True
+
+            partition = nouvelle_partition
+
+        if not changement:
+            print("\nL'automate est déjà minimisé.")
+            return self
+
+        automate_minimise = Automate()
+        automate_minimise.alphabet = self.alphabet
+        état_représentant = {état: list(part)[0] for part in partition for état in part}
+
+        for part in partition:
+            représentant = list(part)[0]
+            automate_minimise.states.add(représentant)
+
+            if représentant in self.initial_states:
+                automate_minimise.initial_states.add(représentant)
+            if représentant in self.final_states:
+                automate_minimise.final_states.add(représentant)
+
+        for état in self.states:
+            représentant = état_représentant[état]
+            for symbole in self.alphabet:
+                next_states = self.transitions.get((état, symbole), set())
+                if next_states:
+                    for next_state in next_states:
+                        automate_minimise.transitions.setdefault((représentant, symbole), set()).add(état_représentant[next_state])
+
+        print("\nMinimisation effectuée avec succès.")
+        return automate_minimise
+
 
 if __name__ == "__main__":
-    """Point d'entrée du programme : teste déterminisation, standardisation, complétion."""
     fichier_automate = "automate2.txt"  # Remplace par ton fichier
 
     # Création et affichage initial de l'automate
     automate = Automate()
-    automate.lire_depuis_fichier(fichier_automate)
+    if not automate.lire_depuis_fichier(fichier_automate):
+        print("Arrêt du programme en raison de l'échec de la lecture.")
+        exit(1)
+
     print("\nAutomate initial :")
-    automate.afficher()
+    automate.afficher()  # Affichage initial avant minimisation
 
     # Complétion
     if not automate.est_complet():
         print("\nL'automate n'est pas complet. Complétion en cours...")
-        automate.completer()
-        automate.afficher()
 
     # Déterminisation (nécessite un automate complet)
     if not automate.est_deterministe():
         print("\nL'automate n'est pas déterministe. Déterminisation en cours...")
         automate = automate.determiniser()
-        automate.afficher()
+        automate.afficher()  # Affiche l'automate après déterminisation
 
     # Standardisation
     if automate.est_standard():
@@ -183,4 +265,12 @@ if __name__ == "__main__":
     else:
         print("\nL'automate n'est pas standard. Standardisation en cours...")
         automate.standardiser()
-        automate.afficher()
+        automate.afficher()  # Affiche l'automate après standardisation
+
+    # Minimisation
+    print("\nMinimisation en cours...")
+    automate_minimise = automate.minimisation()
+
+    # Affichage de l'automate minimisé
+    print("\nAutomate minimisé :")
+    automate_minimise.afficher(automate)  # Passe l'automate original pour vérifier la minimisation
