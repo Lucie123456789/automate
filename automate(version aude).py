@@ -167,7 +167,7 @@ class Automate:
 
     def afficher_tableau(self):
         """Affiche un tableau clair des transitions"""
-        print("\n=== Tableau des Transitions de l'Automate Minimisé ===")
+        print("\nTableau des transitions de l'automate minimisé :")
         header = "Etat" + " | " + " | ".join(sorted(self.alphabet))
         print(header)
         print("-" * len(header))
