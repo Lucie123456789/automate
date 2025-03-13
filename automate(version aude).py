@@ -165,6 +165,20 @@ class Automate:
         print(f"Standard : {'Oui' if self.est_standard() else 'Non'}")
         print(f"Minimisé : {'Oui' if (automate_original and self.est_minimise(automate_original)) else 'Non'}")
 
+    def afficher_tableau(self):
+        """Affiche un tableau clair des transitions"""
+        print("\n=== Tableau des Transitions de l'Automate Minimisé ===")
+        header = "Etat" + " | " + " | ".join(sorted(self.alphabet))
+        print(header)
+        print("-" * len(header))
+        for state in sorted(self.states):
+            row = [state]
+            for symbol in sorted(self.alphabet):
+                destinations = self.transitions.get((state, symbol), set())
+                row.append(",".join(sorted(destinations)) if destinations else "-")
+            print(" | ".join(row))
+        print("\n")
+
 
 
     def est_minimise(self, automate_original):
@@ -172,70 +186,50 @@ class Automate:
         return len(self.states) == len(automate_original.states)
 
     def minimisation(self):
-        automate_original = Automate()
-        automate_original.states = self.states.copy()
-        automate_original.transitions = self.transitions.copy()
-        automate_original.final_states = self.final_states.copy()
-        automate_original.initial_states = self.initial_states.copy()
-
-        # Initialisation de deux partitions
-        partition = [
-            set(self.final_states),
-            set(self.states) - set(self.final_states)
-        ]
-
+        """Minimise l'automate et affiche un tableau clair."""
+        partition = [set(self.final_states), self.states - set(self.final_states)]
         changement = True
+
         while changement:
             changement = False
             nouvelle_partition = []
 
             for groupe in partition:
                 sous_partitions = {}
-
-                for état in groupe:
+                for etat in groupe:
                     signature = tuple(
-                        next((i for i, part in enumerate(partition) if self.transitions.get((état, sym)) in part), -1)
+                        next((i for i, part in enumerate(partition) if self.transitions.get((etat, sym)) in part), -1)
                         for sym in self.alphabet
                     )
-
-                    if signature not in sous_partitions:
-                        sous_partitions[signature] = set()
-                    sous_partitions[signature].add(état)
-
+                    sous_partitions.setdefault(signature, set()).add(etat)
                 nouvelle_partition.extend(sous_partitions.values())
                 if len(sous_partitions) > 1:
                     changement = True
-
             partition = nouvelle_partition
-
-        if not changement:
-            print("\nL'automate est déjà minimisé.")
-            return self
 
         automate_minimise = Automate()
         automate_minimise.alphabet = self.alphabet
-        état_représentant = {état: list(part)[0] for part in partition for état in part}
+        etat_representant = {etat: list(part)[0] for part in partition for etat in part}
 
         for part in partition:
-            représentant = list(part)[0]
-            automate_minimise.states.add(représentant)
+            representant = list(part)[0]
+            automate_minimise.states.add(representant)
+            if representant in self.initial_states:
+                automate_minimise.initial_states.add(representant)
+            if representant in self.final_states:
+                automate_minimise.final_states.add(representant)
 
-            if représentant in self.initial_states:
-                automate_minimise.initial_states.add(représentant)
-            if représentant in self.final_states:
-                automate_minimise.final_states.add(représentant)
-
-        for état in self.states:
-            représentant = état_représentant[état]
+        for etat in self.states:
+            representant = etat_representant[etat]
             for symbole in self.alphabet:
-                next_states = self.transitions.get((état, symbole), set())
+                next_states = self.transitions.get((etat, symbole), set())
                 if next_states:
                     for next_state in next_states:
-                        automate_minimise.transitions.setdefault((représentant, symbole), set()).add(état_représentant[next_state])
+                        automate_minimise.transitions.setdefault((representant, symbole), set()).add(etat_representant[next_state])
 
         print("\nMinimisation effectuée avec succès.")
+        automate_minimise.afficher_tableau()
         return automate_minimise
-
 
 if __name__ == "__main__":
     fichier_automate = "automate2.txt"  # Remplace par ton fichier
@@ -271,6 +265,3 @@ if __name__ == "__main__":
     print("\nMinimisation en cours...")
     automate_minimise = automate.minimisation()
 
-    # Affichage de l'automate minimisé
-    print("\nAutomate minimisé :")
-    automate_minimise.afficher(automate)  # Passe l'automate original pour vérifier la minimisation
