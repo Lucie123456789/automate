@@ -186,50 +186,63 @@ class Automate:
         return len(self.states) == len(automate_original.states)
 
     def minimisation(self):
-        """Minimise l'automate et affiche un tableau clair."""
+        """Minimise l'automate en regroupant les états équivalents de manière déterministe."""
+        
+        # Séparation des états finaux et non finaux
         partition = [set(self.final_states), self.states - set(self.final_states)]
-        changement = True
+        changement = True  
 
         while changement:
             changement = False
             nouvelle_partition = []
 
+            # Tri pour garantir un ordre stable
+            partition = sorted(partition, key=lambda p: sorted(p))
+
             for groupe in partition:
                 sous_partitions = {}
+
                 for etat in groupe:
                     signature = tuple(
                         next((i for i, part in enumerate(partition) if self.transitions.get((etat, sym)) in part), -1)
-                        for sym in self.alphabet
+                        for sym in sorted(self.alphabet)
                     )
                     sous_partitions.setdefault(signature, set()).add(etat)
+
                 nouvelle_partition.extend(sous_partitions.values())
                 if len(sous_partitions) > 1:
                     changement = True
+
             partition = nouvelle_partition
 
+        # Création d'un automate minimisé avec un ordre déterministe
         automate_minimise = Automate()
         automate_minimise.alphabet = self.alphabet
-        etat_representant = {etat: list(part)[0] for part in partition for etat in part}
+
+        # Toujours prendre l'état le plus petit comme représentant
+        etat_representant = {etat: sorted(part)[0] for part in partition for etat in part}
 
         for part in partition:
-            representant = list(part)[0]
+            representant = sorted(part)[0]  # Toujours le premier état trié
             automate_minimise.states.add(representant)
+
             if representant in self.initial_states:
                 automate_minimise.initial_states.add(representant)
             if representant in self.final_states:
                 automate_minimise.final_states.add(representant)
 
-        for etat in self.states:
+        for etat in sorted(self.states):
             representant = etat_representant[etat]
-            for symbole in self.alphabet:
-                next_states = self.transitions.get((etat, symbole), set())
-                if next_states:
-                    for next_state in next_states:
-                        automate_minimise.transitions.setdefault((representant, symbole), set()).add(etat_representant[next_state])
+            for symbole in sorted(self.alphabet):
+                next_states = sorted(self.transitions.get((etat, symbole), set()))
+                for next_state in next_states:
+                    automate_minimise.transitions.setdefault((representant, symbole), set()).add(etat_representant[next_state])
 
         print("\nMinimisation effectuée avec succès.")
         automate_minimise.afficher_tableau()
+        
         return automate_minimise
+
 
 if __name__ == "__main__":
     fichier_automate = "automate2.txt"  # Remplace par ton fichier
