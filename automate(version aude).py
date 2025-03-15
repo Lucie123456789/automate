@@ -165,6 +165,38 @@ class Automate:
         print(f"Standard : {'Oui' if self.est_standard() else 'Non'}")
         print(f"Minimisé : {'Oui' if (automate_original and self.est_minimise(automate_original)) else 'Non'}")
 
+    def complementaire(self):
+        """
+        Calcule et retourne l'automate complémentaire.
+        
+        L'automate complémentaire est obtenu en prenant un automate déterministe et complet
+        et en inversant ses états finaux (les anciens états finaux deviennent non finaux et vice versa).
+        """
+        
+        # L'automate doit être déterministe et complet
+        if not self.est_deterministe():
+            print("L'automate n'est pas déterministe. Déterminisation en cours...")
+            automate = self.determiniser()
+        else:
+            automate = self
+
+        if not automate.est_complet():
+            print("L'automate n'est pas complet. Complétion en cours...")
+            automate.completer()
+
+        # Création de l'automate complémentaire
+        automate_complementaire = Automate()
+        automate_complementaire.states = automate.states.copy()
+        automate_complementaire.alphabet = automate.alphabet.copy()
+        automate_complementaire.transitions = automate.transitions.copy()
+        automate_complementaire.initial_states = automate.initial_states.copy()
+        
+        # Les nouveaux états finaux sont ceux qui n'étaient pas finaux dans l'automate original
+        automate_complementaire.final_states = automate.states - automate.final_states
+        
+        print("Automate complémentaire construit avec succès.")
+        return automate_complementaire
+
     def afficher_tableau(self):
         """Affiche un tableau clair des transitions"""
         print("\nTableau des transitions de l'automate minimisé :")
@@ -273,6 +305,11 @@ if __name__ == "__main__":
         print("\nL'automate n'est pas standard. Standardisation en cours...")
         automate.standardiser()
         automate.afficher()  # Affiche l'automate après standardisation
+
+    # Complémentaire
+    print("\nConstruction de l'automate complémentaire...")
+    automate_complementaire = automate.complementaire()
+    automate_complementaire.afficher()
 
     # Minimisation
     print("\nMinimisation en cours...")
