@@ -120,50 +120,83 @@ class Automate:
         return ''.join(sorted(etats))
 
     def lire_depuis_fichier(self, chemin):
-        """Charge un automate depuis un fichier texte."""
+        """Charge un automate depuis un fichier texte respectant le format spécifié."""
         try:
             with open(chemin, 'r') as f:
                 lignes = [ligne.strip() for ligne in f if ligne.strip()]
         except FileNotFoundError:
-            print(f"Erreur : Le fichier {chemin} n'a pas été trouvé dans {os.path.abspath(chemin)}.")
-            print("Assurez-vous que le fichier existe ou spécifiez le bon chemin.")
+            print(f"Erreur : Le fichier {chemin} est introuvable.")
             return False
-        except Exception as e:
-            print(f"Une erreur s'est produite lors de la lecture du fichier : {e}")
-            return False
-
-        self.alphabet = set(re.split(r'\s+', lignes[0]))
-        self.states = set(re.split(r'\s+', lignes[1]))
-        self.initial_states = set(re.split(r'\s+', lignes[2]))
-        self.final_states = set(re.split(r'\s+', lignes[3]))
-
-        for ligne in lignes[4:]:
-            source, symbole, destination = re.split(r'\s+', ligne)
-            self.transitions.setdefault((source, symbole), set()).add(destination)
-        return True
     
-    def afficher(self, automate_original=None):
-        print('=== Automate ===')
-        print('Alphabet :', ' '.join(sorted(self.alphabet)))
-        print('États :', ' '.join(sorted(self.states)))
-        print('États initiaux :', ' '.join(sorted(self.initial_states)))
-        print('États finaux :', ' '.join(sorted(self.final_states)))
-        print('\nTable de transitions :')
 
-        print(f"{'État':<10} " + ' '.join(f'{symbole:<10}' for symbole in sorted(self.alphabet)))
-        print('-' * (12 + 12 * len(self.alphabet)))
+        # Lecture des informations
+        index = 0
+        nb_symboles = int(lignes[index])
+        index += 1
+        nb_etats = int(lignes[index])
+        index += 1
+        
+        # États initiaux
+        init_data = list(map(int, lignes[index].split()))
+        nb_etats_initiaux = init_data[0]
+        self.initial_states = set(map(str, init_data[1:]))
+        index += 1
+
+        # États terminaux
+        final_data = list(map(int, lignes[index].split()))
+        nb_etats_terminaux = final_data[0]
+        self.final_states = set(map(str, final_data[1:]))
+        index += 1
+
+        # Nombre de transitions
+        nb_transitions = int(lignes[index])
+        index += 1
+
+        # Lire les transitions
+        for i in range(nb_transitions):
+            etat_depart, symbole, etat_arrivee = lignes[index].split()
+            self.states.update([etat_depart, etat_arrivee])
+            self.alphabet.add(symbole)
+            self.transitions.setdefault((etat_depart, symbole), set()).add(etat_arrivee)
+            index += 1
+        
+        return True
+
+    def afficher(self):
+        print("\n=== Automate ===")
+        print("Alphabet :", " ".join(sorted(self.alphabet)))
+        print("États :", " ".join(sorted(self.states)))
+        print("États initiaux :", " ".join(sorted(self.initial_states)))
+        print("États finaux :", " ".join(sorted(self.final_states)))
+    
+        print("\nTable de transitions :")
+
+        # Affichage de l'en-tête
+        header = f"{'Etat':<12} | " + " | ".join(f"{symbole:<10}" for symbole in sorted(self.alphabet))
+        print(header)
+        print("-" * len(header))
 
         for state in sorted(self.states):
-            row = [f'{state:<10}']
+            etat_label = ""
+            if state in self.initial_states:
+                etat_label += "E "  # Marqueur pour état initial
+
+            elif state in self.final_states:
+                etat_label += "S "  # Marqueur pour état final
+            else:
+                etat_label += "  "
+
+            row = [f"{etat_label}{state:<8} |"]
             for symbole in sorted(self.alphabet):
                 destinations = self.transitions.get((state, symbole), set())
-                row.append(','.join(sorted(destinations)).ljust(10) if destinations else '-'.ljust(10))
-            print(' '.join(row))
+                row.append(f"{','.join(sorted(destinations)) if destinations else '-':<10}")
+        
+            print(" ".join(row))
 
-        print(f"\nDéterministe : {'Oui' if self.est_deterministe() else 'Non'}")
-        print(f"Complet : {'Oui' if self.est_complet() else 'Non'}")
-        print(f"Standard : {'Oui' if self.est_standard() else 'Non'}")
-        print(f"Minimisé : {'Oui' if (automate_original and self.est_minimise(automate_original)) else 'Non'}")
+        print("\nDéterministe :", "Oui" if self.est_deterministe() else "Non")
+        print("Complet :", "Oui" if self.est_complet() else "Non")
+        print("Standard :", "Oui" if self.est_standard() else "Non")
+        print("Minimiser :", "Oui" if self.est_standard() else "Non")
 
     def complementaire(self):
         """
