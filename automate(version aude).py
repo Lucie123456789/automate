@@ -21,13 +21,10 @@ class Automate:
     def est_deterministe(self):
         """
         Vérifie si l'automate est déterministe :
-        - Il doit être **complet**.
         - Il ne doit pas y avoir d'état avec plusieurs transitions sur un même symbole.
         - Il ne doit avoir qu'un seul état initial.
         """
-        if not self.est_complet():
-            return False  # Un automate non complet n'est jamais déterministe
-
+       
         if len(self.initial_states) > 1:
             return False
 
@@ -58,7 +55,6 @@ class Automate:
         if self.est_deterministe():
             return self
 
-        self.completer()  # On complète d'abord pour s'assurer qu'on peut déterminiser
 
         new_automate = Automate()
         new_queue = [list(self.initial_states)]
@@ -230,19 +226,7 @@ class Automate:
         print("Automate complémentaire construit avec succès.")
         return automate_complementaire
 
-    def afficher_tableau(self):
-        """Affiche un tableau clair des transitions"""
-        print("\nTableau des transitions de l'automate minimisé :")
-        header = "Etat" + " | " + " | ".join(sorted(self.alphabet))
-        print(header)
-        print("-" * len(header))
-        for state in sorted(self.states):
-            row = [state]
-            for symbol in sorted(self.alphabet):
-                destinations = self.transitions.get((state, symbol), set())
-                row.append(",".join(sorted(destinations)) if destinations else "-")
-            print(" | ".join(row))
-        print("\n")
+   
 
 
 
