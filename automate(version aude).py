@@ -305,9 +305,7 @@ if __name__ == "__main__":
     print("\nAutomate initial :")
     automate.afficher()  # Affichage initial avant minimisation
 
-    # Complétion
-    if not automate.est_complet():
-        print("\nL'automate n'est pas complet. Complétion en cours...")
+
 
     # Déterminisation (nécessite un automate complet)
     if not automate.est_deterministe():
@@ -315,6 +313,9 @@ if __name__ == "__main__":
         automate = automate.determiniser()
         automate.afficher()  # Affiche l'automate après déterminisation
 
+    if not automate.est_complet():
+        print("\nL'automate n'est pas complet. Complétion en cours...")
+        
     # Standardisation
     if automate.est_standard():
         print("\nL'automate est déjà standard.")
