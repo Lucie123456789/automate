@@ -1,176 +1,156 @@
-Projet : Manipulation d'Automates Finis
+README - Projet Automates Finis et Expressions Rationnelles
 Description
-Ce projet est une implémentation en Python d’un outil interactif pour manipuler des automates finis (AFN et AFD). Il permet de lire un automate depuis un fichier, d’afficher ses propriétés, d’effectuer diverses transformations (standardisation, déterminisation, complétion, minimisation), de tester la reconnaissance de mots, et de créer un automate complémentaire. Le programme gère également les ε-transitions, qui sont des transitions spontanées dans un AFN.
+Ce projet, réalisé dans le cadre du cours Automates Finis et Expressions Rationnelles (EFREI P2 2024/2025), implémente un programme Python pour manipuler des automates finis non déterministes (AFN) avec ε-transitions. Le programme permet de charger un automate à partir d'un fichier texte, d'effectuer diverses transformations (standardisation, déterminisation, complétion, minimisation, etc.), et de tester des mots. Les traces d'exécution sont générées automatiquement pour documenter les transformations et les tests.
 
-Le projet est conçu pour être utilisé via une interface utilisateur en ligne de commande, avec des menus interactifs pour guider l’utilisateur à travers les différentes fonctionnalités.
-
-Fonctionnalités
-Lecture d’un automate : Charge un automate depuis un fichier texte au format spécifié.
-Affichage : Affiche les états initiaux, terminaux, et une table de référence des transitions (incluant les ε-transitions si présentes).
-Vérification des propriétés :
-Déterminisme : Vérifie si l’automate est déterministe.
-Complétude : Vérifie si l’automate est complet.
-Standardité : Vérifie si l’automate est standard.
-Transformations :
-Standardisation : Transforme l’automate en un automate standard (un seul état initial, sans transitions entrantes vers cet état).
-Déterminisation : Convertit un AFN (avec ou sans ε-transitions) en un AFD.
-Complétion : Ajoute un état puits pour rendre l’automate complet.
-Minimisation : Minimise un automate déterministe et complet en utilisant l’algorithme de partitionnement.
-Reconnaissance de mots : Teste si un mot donné est accepté par l’automate (nécessite un automate déterministe et complet).
-Automate complémentaire : Crée un automate qui reconnaît le langage complémentaire (nécessite un automate déterministe et complet).
+Fonctionnalités principales
+Chargement d'un automate : Lecture d'un automate à partir d'un fichier texte (par exemple, Automates_tests/exemple_32.txt).
+Affichage : Affichage de l'automate sous forme de table de transitions, avec prise en charge des ε-transitions.
+Vérification des propriétés : Vérification si l'automate est déterministe, complet, et standard.
+Standardisation : Transformation de l'automate en un automate standard (un seul état initial, pas de transitions entrantes vers l'état initial).
+Déterminisation et complétion : Conversion de l'AFN en un automate fini déterministe (AFD) complet, avec prise en compte des ε-transitions.
+Minimisation : Minimisation de l'automate déterministe et complet en utilisant l'algorithme de partitionnement (Hopcroft).
+Test de mots : Vérification si un mot est accepté par l'automate (nécessite un automate déterministe et complet).
+Automate complémentaire : Création de l'automate complémentaire (nécessite un automate déterministe et complet).
+Génération de traces : Enregistrement des traces d'exécution dans des fichiers texte (par exemple, traces/trace_exemple_32.txt).
+Changements récents
+Gestion des ε-transitions : Les ε-transitions sont maintenant correctement prises en compte lors de la déterminisation, en utilisant la fermeture ε pour calculer les nouveaux états.
+Renumérotation des états : Après la déterminisation, les états (qui étaient des frozenset) sont renumérotés en entiers pour simplifier les manipulations et l'affichage.
+Encodage UTF-8 : Les fichiers de trace sont générés avec un encodage UTF-8, et la console est configurée pour gérer les caractères Unicode (nécessaires pour les tables générées par tabulate).
+Minimisation améliorée : La méthode minimiser s'assure que l'automate est déterministe et complet avant de procéder à la minimisation, en appelant determiniser_et_completer si nécessaire.
+Correction de bugs :
+Résolution des erreurs d'encodage (UnicodeEncodeError) en forçant l'encodage UTF-8 pour sys.stdout.
+Résolution des erreurs liées à la gestion des frozenset dans la minimisation.
+Correction d'une UnboundLocalError dans minimiser en s'assurant que la variable automate est toujours définie.
+Structure du projet
+Fichiers principaux :
+automate.py : Contient le code source principal, y compris la classe Automate et la fonction main.
+Automates_tests/ : Répertoire contenant les fichiers d'automates de test (par exemple, exemple_32.txt).
+traces/ : Répertoire où sont générées les traces d'exécution (par exemple, trace_exemple_32.txt).
+Dépendances :
+Python 3.6 ou supérieur (recommandé : Python 3.7+ pour une meilleure gestion de l'encodage).
+Bibliothèque tabulate pour l'affichage des tables (installable via pip install tabulate).
+Installation et exécution
 Prérequis
-Python 3.6+ : Assurez-vous que Python est installé sur votre système.
-Bibliothèque tabulate : Utilisée pour afficher les tables de transitions de manière lisible.
-Installation
-Clonez ou téléchargez ce projet dans un répertoire local :
-git clone <url-du-projet>
-cd <nom-du-projet>
-Installez la bibliothèque tabulate via pip :
+Assurez-vous que Python 3 est installé sur votre système :
 bash
+
+python --version
+Si ce n'est pas le cas, téléchargez et installez Python depuis python.org.
+Installez la bibliothèque tabulate :
+bash
+
 pip install tabulate
-Assurez-vous que le fichier automate.py (contenant le code principal) est dans le répertoire.
-Structure des fichiers
-automate.py : Le fichier principal contenant la classe Automate et l’interface utilisateur.
-exemple_X.txt : Fichiers d’entrée contenant les automates (par exemple, automate1.txt).
-Format des fichiers d’entrée
-Les fichiers d’entrée doivent respecter le format suivant :
-
-<nombre de symboles>
-<nombre d'états>
-<nombre d'états initiaux> <état initial 1> ... <état initial n>
-<nombre d'états terminaux> <état terminal 1> ... <état terminal m>
-<nombre de transitions>
-<état de départ> <symbole> <état d'arrivée>
-...
-Les symboles de l’alphabet sont générés automatiquement comme a, b, c, ... (par exemple, si <nombre de symboles> = 2, l’alphabet est {a, b}).
-Les états sont numérotés de 0 à <nombre d'états> - 1.
-Le symbole "&" est utilisé pour les ε-transitions.
-Exemple (exemple_1.txt) :
-
-2
-11
-1 0
-1 10
-14
-0 & 1
-0 & 4
-1 a 2
-1 & 10
-2 b 3
-3 & 10
-4 & 5
-5 a 6
-5 & 6
-6 b 7
-7 & 8
-8 a 9
-8 & 10
-9 & 10
-2 symboles (a, b)
-11 états (0 à 10)
-1 état initial (0)
-1 état terminal (10)
-14 transitions (dont plusieurs ε-transitions)
-Utilisation
-Lancez le programme :
+Exécution
+Clonez ou téléchargez le projet dans un répertoire local.
+Placez-vous dans le répertoire du projet :
 bash
+
+cd chemin/vers/le/projet
+Exécutez le programme :
+bash
+
 python automate.py
-Suivez les menus interactifs :
-Menu principal :
-Choisir un automate (entrez un numéro pour charger automate<numero>.txt).
-Quitter.
-Menu automate :
-Afficher l’automate.
-Vérifier les propriétés (déterminisme, complétude, standardité).
-Standardiser l’automate.
-Déterminiser et compléter.
-Minimiser l’automate.
-Tester des mots.
-Créer l’automate complémentaire.
-Retour au menu principal.
-Exemple d’utilisation
+Suivez les instructions du menu interactif pour charger un automate et effectuer des transformations.
+Exemple d'utilisation
 Lancez le programme :
 bash
 
 python automate.py
-Au menu principal, entrez 1 pour choisir un automate, puis entrez test pour charger automate_test.txt.
-Au menu automate, entrez 1 pour afficher l’automate :
+Choisissez l'option 1 pour charger un automate (par exemple, entrez 32 pour charger Automates_tests/exemple_32.txt).
+Utilisez les options du menu pour effectuer des transformations (affichage, vérification des propriétés, déterminisation, minimisation, etc.).
+Les traces d'exécution sont automatiquement enregistrées dans le répertoire traces/ (par exemple, traces/trace_exemple_32.txt).
+Exemple de trace
+Voici un extrait d'une trace générée pour l'automate exemple_32.txt :
+
 text
 
+Trace de l'automate Automates_tests/exemple_32.txt
+
+Automate lu avec succès depuis Automates_tests/exemple_32.txt.
+
+--- Affichage de l'automate ---
 États initiaux : 0
-États terminaux : 10
+États terminaux : 21
 
-Tableau de référence :
-+-------+-----+-----+-------+
-| État  |  a  |  b  |   ε   |
-+-------+-----+-----+-------+
-| E0    | --  | --  | 1,4   |
-| 1     | 2   | --  | 10    |
-| 2     | --  | 3   | --    |
-| 3     | --  | --  | 10    |
-| 4     | --  | --  | 5     |
-| 5     | 6   | --  | 6     |
-| 6     | --  | 7   | --    |
-| 7     | --  | --  | 8     |
-| 8     | 9   | --  | 10    |
-| 9     | --  | --  | 10    |
-| S10   | --  | --  | --    |
-+-------+-----+-----+-------+
-Entrez 4 pour déterminiser et compléter l’automate, puis 1 pour afficher le résultat :
-text
+Table de transitions :
++------+----+----+----+----+-------+
+| État | a  | b  | c  | d  |   &   |
++------+----+----+----+----+-------+
+|  E0  | -- | -- | -- | -- | 1,10  |
+|  1   | -- | -- | -- | -- |  2,6  |
+|  2   | -- | -- | -- | -- |  3,5  |
+|  3   | -- | 4  | -- | -- |  --   |
+|  4   | -- | -- | -- | -- |  3,5  |
+|  5   | -- | -- | -- | -- |   8   |
+|  6   | 7  | -- | -- | -- |  --   |
+|  7   | -- | -- | -- | -- |   8   |
+|  8   | -- | -- | 9  | -- |  --   |
+|  9   | -- | -- | -- | -- |  21   |
+|  10  | -- | -- | -- | -- | 11,15 |
+|  11  | -- | -- | -- | -- | 12,14 |
+|  12  | 13 | -- | -- | -- |  --   |
+|  13  | -- | -- | -- | -- | 12,14 |
+|  14  | -- | -- | -- | -- |  17   |
+|  15  | -- | 16 | -- | -- |  --   |
+|  16  | -- | -- | -- | -- |  17   |
+|  17  | -- | -- | -- | -- | 18,20 |
+|  18  | -- | -- | 19 | -- |  --   |
+|  19  | -- | -- | -- | -- | 18,20 |
+|  20  | -- | -- | -- | -- |  21   |
+| S21  | -- | -- | -- | -- |  --   |
++------+----+----+----+----+-------+
 
-Correspondance des états après déterminisation :
-État 0 : 0,1,4,5,6,10
-État 1 : 2,3,6,7,8,10
-État 2 : 7,8,10
-État 3 : 9,10
-L'automate a été déterminisé (avec prise en compte des ε-transitions).
+--- Vérification des propriétés ---
+L'automate n'est pas déterministe : plusieurs transitions depuis l'état 0 avec le symbole '&'.
+Déterministe : False
+L'automate n'est pas complet : il manque une transition depuis l'état 0 avec le symbole 'a'.
+Complet : False
+Standard : True
+
+--- Déterminisation et complétion ---
+L'automate a été déterminisé.
 L'automate a été complété.
 
-États initiaux : 0
-États terminaux : 0,1,2,3
+--- Minimisation ---
+L'automate est déjà déterministe et complet.
+Partition initiale :
+Groupe 0 : frozenset({0, 1, 2, 3, 5, 6, 8, 10, 11, 12, 14, 15, 17, 18, 20, 21}), frozenset({18, 19, 20, 21, 9}), frozenset({3, 4, 5, 8, 16, 17, 18, 20, 21}), frozenset({17, 18, 20, 21, 12, 13, 14}), frozenset({9, 21}), frozenset({18, 19, 20, 21}), frozenset({7, 8, 12, 13, 14, 17, 18, 20, 21})
+Groupe 1 : frozenset({8, 3, 4, 5}), frozenset({22})
+L'automate a été minimisé.
 
-Tableau de référence :
-+-------+----------+-------+
-| État  |    a     |   b   |
-+-------+----------+-------+
-| E0    | 1        | 2     |
-| S1    | 3        | 2     |
-| S2    | 3        | 4     |
-| S3    | 4        | 4     |
-| 4     | 4        | 4     |
-+-------+----------+-------+
-Entrez 6 pour tester des mots :
-text
+--- Test de mots ---
+Le mot 'abcd' est rejeté.
+Le mot 'aaabbbbbcccdddddddddddd' est rejeté.
+Le mot 'aaaaaaaaaaa' est accepté.
+Le mot 'ccccccc' est accepté.
+Contenu du rendu
+Conformément aux instructions du projet (EFREI P2 2024/2025) :
 
-Entrez un mot à tester (ou 'fin' pour quitter) : ab
-Le mot 'ab' est accepté.
-Entrez un mot à tester (ou 'fin' pour quitter) : fin
-Détails techniques
-Gestion des ε-transitions :
-Les ε-transitions sont gérées lors de la déterminisation en calculant les fermetures ε.
-La table de transition affiche une colonne "&" uniquement s’il existe des ε-transitions et dans ce cas elle est considirée comme une table de référence.
-
-Affichage :
-Les tables sont affichées avec tabulate pour une présentation claire.
-Renumérotation des états :
-Après minimisation, les états sont renumérotés en entiers pour simplifier les opérations ultérieures.
-Les correspondances entre les anciens et nouveaux états sont affichées lors des transformations (déterminisation, minimisation).
-Limitations
-Les automates doivent être définis dans des fichiers au format spécifié.
-La reconnaissance de mots et la création de l’automate complémentaire nécessitent un automate déterministe et complet (le programme effectue automatiquement la déterminisation et la complétion si nécessaire).
-Les performances peuvent être affectées pour des automates très grands, en raison de la complexité exponentielle de la déterminisation.
-Contribution
-Pour contribuer à ce projet :
-
-Forkez le dépôt.
-Créez une branche pour vos modifications :
-bash
-
-git checkout -b feature/nouvelle-fonctionnalite
-Effectuez vos modifications et testez-les.
-Soumettez une pull request.
+Code source :
+Fichier : Automate.py
+Contient le code complet, y compris la gestion des ε-transitions et la génération des traces.
+Traces d'exécution :
+Répertoire : traces/
+Fichiers générés pour chaque automate testé (par exemple, trace_exemple_32.txt).
+Les traces incluent toutes les transformations et tests demandés (affichage, vérification des propriétés, standardisation, déterminisation, minimisation, test de mots, automate complémentaire).
+Fichier README (facultatif) :
+Un fichier PDF expliquant le travail.
+Problèmes connus et solutions
+Encodage sur Windows :
+Problème : Les caractères Unicode utilisés par tabulate provoquaient des erreurs d'encodage (UnicodeEncodeError) sur Windows.
+Solution : Forcer l'encodage UTF-8 pour sys.stdout avec io.TextIOWrapper (compatible avec Python < 3.7) ou sys.stdout.reconfigure (Python 3.7+).
+Gestion des frozenset :
+Problème : Après la déterminisation, les états étaient des frozenset, ce qui compliquait la minimisation.
+Solution : Les états sont renumérotés en entiers dans determiniser, et minimiser fonctionne avec des entiers.
+Variable non définie dans minimiser :
+Problème : Une UnboundLocalError se produisait si l'automate était déjà déterministe et complet.
+Solution : Ajout d'un bloc else pour s'assurer que la variable automate est toujours définie.
+Améliorations futures
+Ajouter une interface graphique pour visualiser les automates.
+Optimiser l'algorithme de minimisation pour des automates de grande taille.
+Ajouter des tests unitaires pour valider chaque méthode de la classe Automate.
 Auteurs
-[Votre nom] - Développeur principal
-Licence
-Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus de détails.
+[KABORE Boudnoma B. Fortune] [IDOUFKIR Marouane] [LABAT Aude] [OZGULLU Lucie] [HAJI Myriam] - Étudiants à l'EFREI Paris, P2 Promo 2028.
+Remerciements
+Merci aux enseignants Helen KASSEL et Olga MELEKHOVA pour leur encadrement et leurs conseils.
+Merci à l'assistant IA Grok (xAI) pour son aide dans le débogage et la rédaction de ce README.
