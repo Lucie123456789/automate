@@ -56,75 +56,217 @@ Lancez le programme :
 bash
 
 python automate.py
-Choisissez l'option 1 pour charger un automate (par exemple, entrez 32 pour charger Automates_tests/exemple_32.txt).
+Choisissez l'option 1 pour charger un automate (par exemple, entrez 9 pour charger Automates_tests/exemple_9.txt).
 Utilisez les options du menu pour effectuer des transformations (affichage, vérification des propriétés, déterminisation, minimisation, etc.).
 Les traces d'exécution sont automatiquement enregistrées dans le répertoire traces/ (par exemple, traces/trace_exemple_32.txt).
 Exemple de trace
-Voici un extrait d'une trace générée pour l'automate exemple_32.txt :
+Voici un extrait d'une trace générée pour l'automate exemple_9.txt :
 
 text
+Trace de l'automate Automates_tests/exemple_9.txt
 
-Trace de l'automate Automates_tests/exemple_32.txt
+Automate lu avec succès depuis Automates_tests/exemple_9.txt.
 
-Automate lu avec succès depuis Automates_tests/exemple_32.txt.
+=== Menu Automate ===
+1. Afficher l'automate
+2. Vérifier les propriétés
+3. Standardiser l'automate
+4. Déterminiser et compléter
+5. Minimiser l'automate
+6. Tester des mots
+7. Créer l'automate complémentaire
+8. Retour au menu principal
 
 --- Affichage de l'automate ---
-États initiaux : 0
-États terminaux : 21
+États initiaux : 1
+États terminaux : 0
 
 Table de transitions :
-+------+----+----+----+----+-------+
-| État | a  | b  | c  | d  |   &   |
-+------+----+----+----+----+-------+
-|  E0  | -- | -- | -- | -- | 1,10  |
-|  1   | -- | -- | -- | -- |  2,6  |
-|  2   | -- | -- | -- | -- |  3,5  |
-|  3   | -- | 4  | -- | -- |  --   |
-|  4   | -- | -- | -- | -- |  3,5  |
-|  5   | -- | -- | -- | -- |   8   |
-|  6   | 7  | -- | -- | -- |  --   |
-|  7   | -- | -- | -- | -- |   8   |
-|  8   | -- | -- | 9  | -- |  --   |
-|  9   | -- | -- | -- | -- |  21   |
-|  10  | -- | -- | -- | -- | 11,15 |
-|  11  | -- | -- | -- | -- | 12,14 |
-|  12  | 13 | -- | -- | -- |  --   |
-|  13  | -- | -- | -- | -- | 12,14 |
-|  14  | -- | -- | -- | -- |  17   |
-|  15  | -- | 16 | -- | -- |  --   |
-|  16  | -- | -- | -- | -- |  17   |
-|  17  | -- | -- | -- | -- | 18,20 |
-|  18  | -- | -- | 19 | -- |  --   |
-|  19  | -- | -- | -- | -- | 18,20 |
-|  20  | -- | -- | -- | -- |  21   |
-| S21  | -- | -- | -- | -- |  --   |
-+------+----+----+----+----+-------+
++------+----+----+
+| État | a  | b  |
++------+----+----+
+|  S0  | -- | -- |
+|  E1  | 2  | -- |
+|  2   | 3  | 3  |
+|  3   | 4  | -- |
+|  4   | 5  | 5  |
+|  5   | 0  | -- |
++------+----+----+
+
+=== Menu Automate ===
+1. Afficher l'automate
+2. Vérifier les propriétés
+3. Standardiser l'automate
+4. Déterminiser et compléter
+5. Minimiser l'automate
+6. Tester des mots
+7. Créer l'automate complémentaire
+8. Retour au menu principal
 
 --- Vérification des propriétés ---
-L'automate n'est pas déterministe : plusieurs transitions depuis l'état 0 avec le symbole '&'.
-Déterministe : False
-L'automate n'est pas complet : il manque une transition depuis l'état 0 avec le symbole 'a'.
+Déterministe : True
+L'automate n'est pas complet : aucune transition depuis l'état 0.
 Complet : False
 Standard : True
 
+=== Menu Automate ===
+1. Afficher l'automate
+2. Vérifier les propriétés
+3. Standardiser l'automate
+4. Déterminiser et compléter
+5. Minimiser l'automate
+6. Tester des mots
+7. Créer l'automate complémentaire
+8. Retour au menu principal
+
+--- Standardisation ---
+L'automate est déjà standard.
+
+=== Menu Automate ===
+1. Afficher l'automate
+2. Vérifier les propriétés
+3. Standardiser l'automate
+4. Déterminiser et compléter
+5. Minimiser l'automate
+6. Tester des mots
+7. Créer l'automate complémentaire
+8. Retour au menu principal
+
 --- Déterminisation et complétion ---
-L'automate a été déterminisé.
+L'automate est déterministe.
+L'automate n'est pas complet : aucune transition depuis l'état 0.
+Complétion de l'automate déterministe.
+L'automate n'est pas complet : aucune transition depuis l'état 0.
 L'automate a été complété.
+États initiaux : 1
+États terminaux : 0
+
+Table de transitions :
++------+---+---+
+| État | a | b |
++------+---+---+
+|  S0  | 6 | 6 |
+|  E1  | 2 | 6 |
+|  2   | 3 | 3 |
+|  3   | 4 | 6 |
+|  4   | 5 | 5 |
+|  5   | 0 | 6 |
+|  6   | 6 | 6 |
++------+---+---+
+
+=== Menu Automate ===
+1. Afficher l'automate
+2. Vérifier les propriétés
+3. Standardiser l'automate
+4. Déterminiser et compléter
+5. Minimiser l'automate
+6. Tester des mots
+7. Créer l'automate complémentaire
+8. Retour au menu principal
 
 --- Minimisation ---
+Minimisation de l'automate.
 L'automate est déjà déterministe et complet.
 Partition initiale :
-Groupe 0 : frozenset({0, 1, 2, 3, 5, 6, 8, 10, 11, 12, 14, 15, 17, 18, 20, 21}), frozenset({18, 19, 20, 21, 9}), frozenset({3, 4, 5, 8, 16, 17, 18, 20, 21}), frozenset({17, 18, 20, 21, 12, 13, 14}), frozenset({9, 21}), frozenset({18, 19, 20, 21}), frozenset({7, 8, 12, 13, 14, 17, 18, 20, 21})
-Groupe 1 : frozenset({8, 3, 4, 5}), frozenset({22})
+Groupe 0 : 0
+Groupe 1 : 1, 2, 3, 4, 5, 6
+Partition après raffinement :
+Groupe 0 : 0
+Groupe 1 : 1
+Groupe 2 : 2
+Groupe 3 : 3
+Groupe 4 : 4
+Groupe 5 : 5
+Groupe 6 : 6
+Partition après raffinement :
+Groupe 0 : 0
+Groupe 1 : 1
+Groupe 2 : 2
+Groupe 3 : 3
+Groupe 4 : 4
+Groupe 5 : 5
+Groupe 6 : 6
+Correspondance des états après minimisation :
+État 0 : 0
+État 1 : 1
+État 2 : 2
+État 3 : 3
+État 4 : 4
+État 5 : 5
+État 6 : 6
 L'automate a été minimisé.
+États initiaux : 1
+États terminaux : 0
+
+Table de transitions :
++------+---+---+
+| État | a | b |
++------+---+---+
+|  S0  | 6 | 6 |
+|  E1  | 2 | 6 |
+|  2   | 3 | 3 |
+|  3   | 4 | 6 |
+|  4   | 5 | 5 |
+|  5   | 0 | 6 |
+|  6   | 6 | 6 |
++------+---+---+
+
+=== Menu Automate ===
+1. Afficher l'automate
+2. Vérifier les propriétés
+3. Standardiser l'automate
+4. Déterminiser et compléter
+5. Minimiser l'automate
+6. Tester des mots
+7. Créer l'automate complémentaire
+8. Retour au menu principal
 
 --- Test de mots ---
-Le mot 'abcd' est rejeté.
-Le mot 'aaabbbbbcccdddddddddddd' est rejeté.
-Le mot 'aaaaaaaaaaa' est accepté.
-Le mot 'ccccccc' est accepté.
-Contenu du rendu
-Conformément aux instructions du projet (EFREI P2 2024/2025) :
+Le mot 'a' est rejeté.
+Le mot 'aaa' est rejeté.
+Le mot 'b' est rejeté.
+Le mot 'bb' est rejeté.
+Le mot 'bbbaaa' est rejeté.
+Le mot 'aabbbaaa' est rejeté.
+Le mot '' est rejeté.
+
+=== Menu Automate ===
+1. Afficher l'automate
+2. Vérifier les propriétés
+3. Standardiser l'automate
+4. Déterminiser et compléter
+5. Minimiser l'automate
+6. Tester des mots
+7. Créer l'automate complémentaire
+8. Retour au menu principal
+
+--- Création de l'automate complémentaire ---
+L'automate complémentaire a été construit.
+États initiaux : 1
+États terminaux : 1, 2, 3, 4, 5, 6
+
+Table de transitions :
++------+---+---+
+| État | a | b |
++------+---+---+
+|  0   | 6 | 6 |
+| ES1  | 2 | 6 |
+|  S2  | 3 | 3 |
+|  S3  | 4 | 6 |
+|  S4  | 5 | 5 |
+|  S5  | 0 | 6 |
+|  S6  | 6 | 6 |
++------+---+---+
+
+=== Menu Automate ===
+1. Afficher l'automate
+2. Vérifier les propriétés
+3. Standardiser l'automate
+4. Déterminiser et compléter
+5. Minimiser l'automate
+6. Tester des mots
+7. Créer l'automate complémentaire
+8. Retour au menu principal
 
 Code source :
 Fichier : Automate.py
